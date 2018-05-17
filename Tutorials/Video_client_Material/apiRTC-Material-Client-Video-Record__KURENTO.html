@@ -66,11 +66,8 @@
             background: #d6d6d6;
         }
         </style>
-<!--
+
         <script src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.debug.js"></script>
--->
-        <script src="https://192.168.1.86:8443/dev/apirtc/bin/apiRTC-3.18.min.debug.js"></script>
-        
     </head>
 
     <body>
@@ -85,34 +82,33 @@
 
         <main class="container grey lighten-5">
             <div class="container master grey lighten-5">
-                <h3><i class="fa fa-dot-circle-o"></i> Tutorial 5: ApiRTC client with screenSharing feature</h3>
+                <h3><i class="fa fa-dot-circle-o"></i> Tutorial 7: ApiRTC client with recording feature</h3>
                 <p>
-                <a href="https://github.com/apizee/ApiRTC-examples/blob/master/Tutorials/Video_client_Material/apiRTC-Material-Client-Video-ScreenSharing.html" target="_blank"><i class="fa fa-github" style="vertical-align: middle;"></i> This sample is accessible on Github</a>
+                <a href="https://github.com/apizee/ApiRTC-examples/blob/master/Tutorials/Video_client_Material/apiRTC-Material-Client-Video-Record.html" target="_blank"><i class="fa fa-github" style="vertical-align: middle;"></i> This sample is accessible on Github</a>
                 </p>
                 <br>
                 <div class="row">
                     <div class="col s12 m8 l8">
-                        <p>This sample shows an apiRTC client that enable screen sharing.
-                        For security reason, HTTPS is mandatory for this feature. This is only available with Chrome on PC.
+                        <p>This sample shows an apiRTC client that enable calls recording.
                         </p>
-                        <p>ScreenSharing can be simultaneously used with a video call.
+                        <p>At the end of the call an apiRTC event is fired that enables you to get all the needed informations to play the recorded files.
                         </p>
-                        <p>Check the comment "ScreenSharing" in the source code to know what need to be added for the Accept/Refuse feature.
+                        <p>Check the comment "Record" in the source code to know what need to be added on your apiRTC application for the recording feature.
                         </p>
                         <p>Used apiRTC functions are :
                             <ul>
-                            <li> - webRTCClient.shareScreen()</li>
-                            <li> - webRTCClient.activateScreenSharing()</li>
+                            <li> - webRTCClient.call() with option 'RECORD'</li>
+                            <li> - webRTCClient.setRecordedCall() can be use to set an option to RECORD all the calls (this is not shown in this demo)</li>
                             </ul>
                         </p>
                         <p>Used apiRTC events are :
                             <ul>
-                            <li> - desktopCapture</li>
+                            <li> - recordedStreamsAvailable</li>
                             </ul>
                         </p>
                     </div>
                     <div class="col s12 m4 l4 valign-wrapper">
-                        <a href="../Video_client_Material/apiRTC-Material-Client-Video-ScreenSharing.html" target="_blank" class="valign btn btn-large waves-effect waves-light btn-open">Open another client</a>
+                        <a href="../Video_client_Material/apiRTC-Material-Client-Video-Record.html" target="_blank" class="valign btn btn-large waves-effect waves-light btn-open">Open another client</a>
                     </div>
                     <div style="clear: both;"></div>
                 </div>
@@ -132,9 +128,14 @@
                               <i class="fa fa-phone"></i>
                             </button>
             <!--ScreenSharing-->
-                            <button type="button" id="shareScreen" class="btn btn-success">
-                              <i class="fa fa-desktop"></i>
+                            <button type="button" id="recordVideo" class="btn red">
+                              <i class="fa fa-dot-circle-o"></i>
                             </button>
+
+
+    <!--TODO ajouter setRecorded -->
+
+
                             <input id="hangup" class="btn red" type="button" disabled="true" value="Hangup" />
                             <input type="text" id="number" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
                         </div>
@@ -190,7 +191,8 @@
             'use strict';
             var session = null,
                 webRTCClient = null,
-                connectedUsersList = [];
+                connectedUsersList = [],
+                yourApiKey = "myDemoApiKey";
 
             function selectPhonebookItem(idItem) {
                 $("#number").val(idItem);
@@ -220,7 +222,7 @@
                     mediaElt.style.borderRadius = "1px";
                     console.log('Patch for video display on Chrome 61 Android');
                 }
-
+                
                 divElement = document.getElementById(divId);
                 divElement.appendChild(mediaElt);
 
@@ -319,14 +321,18 @@
                 console.log("remoteStreamAddedHandler, e.detail.callType :" + e.detail.callType);
                 console.log("userMediaSuccessHandler e.detail.remoteId :" + e.detail.remoteId);
 
+                console.log("remoteStreamAddedHandler e.detail.destCallType :" + e.detail.destCallType);
+
                 //Adding Remote Stream in Div. Video is not muted
 
             //You can decide to manage your own stream display function or use the integrated one of ApiRTC
             /*
-                addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+                addStreamInDiv(e.detail.stream, e.detail.destCallType, "remote", 'remoteElt-' + e.detail.callId,
                                {width : "640px", height : "480px"}, false);
             */
-                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
+
+                // using e.detail.destCallType as streamType
+                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.destCallType, "remote", 'remoteElt-' + e.detail.callId,
                                {width : "640px", height : "480px"}, false);
             }
 
@@ -369,6 +375,20 @@
                 updateAddressBook();
             }
 
+        //Record
+            function recordedStreamsAvailableHandler(e) {
+                console.error("recordedStreamsAvailableHandler");
+                console.log("confId : " + e.detail.confId);
+                console.log("userId1 : " + e.detail.userId1);
+                console.log("userId2 : " + e.detail.userId2);
+
+                if (e.detail.mediaURL !== undefined) {
+                    document.getElementById('status2').innerHTML = 'Read recorded streams thanks to following <a href="' + e.detail.mediaURL + '" target="_blank">link</a>';              
+                } else {
+                    document.getElementById('status2').innerHTML = 'Read recorded streams thanks to following <a href="http://www.apizee.com/apiRTC/Video_record/recordReader.html?apiKey=' + yourApiKey + '&confId=' + e.detail.confId  + '&userId1=' + e.detail.userId1  + '&userId2=' + e.detail.userId2 + '" target="_blank">link</a>';
+                }
+            }
+
         //screenSharing
             function desktopCaptureHandler(e) {
                 console.log("e.detail.event :" + e.detail.event);
@@ -401,6 +421,9 @@
                 apiRTC.addEventListener("connectedUsersListUpdate", connectedUsersListUpdateHandler);
             //connectedUsersList
 
+            //Record
+                apiRTC.addEventListener("recordedStreamsAvailable", recordedStreamsAvailableHandler);
+
                 //webRTC Client creation
                 webRTCClient = apiRTC.session.createWebRTCClient({
                     status : "status" //Optionnal
@@ -415,6 +438,7 @@
             //ScreenSharing Activation
                 webRTCClient.activateScreenSharing();
 
+                webRTCClient.setMCUConnector('mcu3.apizee.com');
             //Call establishment
                 $("#callVideo").click(function () {
                     $("#hangup").attr("disabled", false).val("Hangup");
@@ -426,29 +450,26 @@
                     }
                 });
 
+            //Record
+                $("#recordVideo").click(function () {
+                    $("#hangup").attr("disabled", false).val("Hangup");
+                    var callId = webRTCClient.call($("#number").val(), 'RECORD');
+
+                    console.log("callId on call =" + callId);
+                    if (callId != null) {
+                        addHangupButton(callId);
+                    }
+                });
+
+                $("#setRecordedCall").click(function () {
+                    console.log("setRecordedCall");
+                    apiRTC.session.apiCCWebRTCClient.setRecordedCall(true);
+                });
+
             //ScreenSharing establishment
                 $("#shareScreen").click(function () {
-                    
-                    console.log("Click on shareScreen");
-
                     $("#hangup").attr("disabled", false).val("Hangup");
-
-                    var data = {dataTest: 'DataOnShareScreen'};
-
-                    if (apiRTC.browser === "Chrome") {
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, ["screen", "window", "tab", "audio"]);
-                        var callId = webRTCClient.shareScreen($("#number").val(), data);
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, ["screen"]);
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, ["window", "tab"]);
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, ["tab", "audio"]);
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, ["screen", "window", "tab"]);
-
-                    } else if (apiRTC.browser === "Firefox") {
-
-                        var callId = webRTCClient.shareScreen($("#number").val(), data, "screen");
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, "window");
-                        //var callId = webRTCClient.shareScreen($("#number").val(), data, "application");
-                    }
+                    var callId = webRTCClient.shareScreen($("#number").val());
 
                     console.log("callId on sharescreen =" + callId);
                     if (callId != null) {
@@ -469,7 +490,7 @@
 
             //apiRTC initialization
             apiRTC.init({
-                apiKey : "myDemoApiKey",
+                apiKey : yourApiKey,
                 //apiCCId : "1",
                 onReady : sessionReadyHandler
             });

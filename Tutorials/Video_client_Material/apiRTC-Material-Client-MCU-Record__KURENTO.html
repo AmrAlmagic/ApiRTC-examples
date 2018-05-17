@@ -68,7 +68,7 @@
 <!--
         <script src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.js"></script>
 -->
-        <script src="https://192.168.1.86:8443/dev/apirtc/bin/apiRTC-3.18.min.debug.js"></script>
+        <script src="https://cloud.apizee.com/apiRTC/v3.18/apiRTC-3.18.min.debug.js"></script>
     </head>
 
     <body>
@@ -83,41 +83,37 @@
 
         <main class="container grey lighten-5">
             <div class="container master grey lighten-5">
-                <h3><i class="fa fa-dot-circle-o"></i> Tutorial 12: ApiRTC - Group Video call - Advanced</h3>
+                <h3><i class="fa fa-dot-circle-o"></i> Tutorial 15: ApiRTC - Group Video call with recording</h3>
                 <p>
-                <a href="https://github.com/apizee/ApiRTC-examples/blob/master/Tutorials/Video_client_Material/apiRTC-Material-Client-MCU.html" target="_blank"><i class="fa fa-github" style="vertical-align: middle;"></i> This sample is accessible on Github</a>
+                <a href="https://github.com/apizee/ApiRTC-examples/blob/master/Tutorials/Video_client_Material/apiRTC-Material-Client-MCU-Record.html" target="_blank"><i class="fa fa-github" style="vertical-align: middle;"></i> This sample is accessible on Github</a>
                 </p>
                 <br>
                 <div class="row">
                     <div class="col s12 m8 l8">
                         This sample shows an apiRTC client build with Material design.
-                        With this demo you can:
-                        <br>
-                        <ul>
-                        <li>o Establish several simultaneous calls with different clients.</li>
-                        <li>o Choose to publish, unpublish, subscribe, subscribe in audio only, subscribe in video only, unsubscribe video streams depending of your choice.</li>
-                        </ul>
-                        <br>
-                        <strong>Steps: </strong>
-                        <ol>
-                        <li>Type in the name of a room and join in.</li>
-                        <li>Click on the blue tags "publish", "publish audio only",etc. To choose what you want to stream. </li>
-                        <li>To open another room, simply type and join again with a different room name. The list of subscribed rooms will be listed one below the other.</li>
-                        </ol>
+                        This sample enables you to establish multiple simultaneous call with different client.
+                        This sample also shows you how to publish, unpublish, subscribe, unsubscribe video streams depending of your choice.
+                        Finally, you have the possibility to record the published stream and then to read the associated recorded file.
                     </div>
                     <div class="col s12 m4 l4 valign-wrapper">
-                        <a href="../Video_client_Material/apiRTC-Material-Client-MCU.html" target="_blank" class="valign btn btn-large waves-effect waves-light btn-open">Open another client</a>
+                        <a href="../Video_client_Material/apiRTC-Material-Client-MCU-Record.html" target="_blank" class="valign btn btn-large waves-effect waves-light btn-open">Open another client</a>
                     </div>
                     <div style="clear: both;"></div>
                 </div>
 
                 <div class="row">
                     <div class="col s12 m12 l12">
-                        <div class="col s12 m6 l6">
+                        <div class="col s12 m12 l12">
                             <div class="input-field">
+
                                 <input type="text" id="number" class="form-control" placeholder="Room name" aria-describedby="sizing-addon1">
                                 <input id="joinMCUSession" class="btn green" type="button" value="join Video Group" />
                                 <input id="leaveMCUSession" class="btn green" type="button" value="leave" />
+                                <br>
+                                <input id="startRecording" class="btn green" type="button" disabled="true" value="Record Audio & Video" />
+                                <input id="startRecordingAudioOnly" class="btn green" type="button" disabled="true" value="Record Audio Only" />
+                                <input id="startRecordingVideoOnly" class="btn green" type="button" disabled="true" value="Record Video only" />
+                                <input id="stopRecording" class="btn green" type="button" disabled="true" value="stop Record" />
                             </div>
                         </div>
 
@@ -181,9 +177,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
         <script>
             'use strict';
-
-            apiRTC.setLogLevel(10);
-
             var session = null,
                 webRTCClient = null,
                 connectedUsersList = [],
@@ -347,6 +340,10 @@
                 $( "#publish" ).replaceWith( '<li class="collection-item" id=publish><div>' + 'My Stream :' + '<a onclick="publishStream(' + "'" + $("#number").val() + "','" + sessionId + "','" + token + "','" + audioOnly + "'" + ');" class="secondary-content"><i class="material-icons">Publish</i></a></div></li>');
                 audioOnly = true;
                 $("#localStreamList").append('<li class="collection-item" id=publishAudio><div>' + 'My Stream :' + '<a onclick="publishStream(' + "'" + $("#number").val() + "','" + sessionId + "','" + token + "','" + audioOnly + "'" + ');" class="secondary-content"><i class="material-icons">Publish Audio Only</i></a></div></li>');
+
+                $("#startRecording").attr("disabled", true);
+                $("#startRecordingAudioOnly").attr("disabled", true);
+                $("#startRecordingVideoOnly").attr("disabled", true);
             }
 
             function publishStream(roomId, sessionId, token, audioOnly) {
@@ -357,6 +354,10 @@
                 var callId = webRTCClient.publish(roomId, sessionId, token, audioOnly);
                 $("#publish").replaceWith( '<li class="collection-item" id=publish><div>' + 'My Stream :' + '<a onclick="unpublishStream(' + callId + ');" class="secondary-content"><i class="material-icons">Unpublish</i></a></div></li>');
                 $("#publishAudio").remove();
+
+                $("#startRecording").attr("disabled", false);
+                $("#startRecordingAudioOnly").attr("disabled", false);
+                $("#startRecordingVideoOnly").attr("disabled", false);
             }
 
 //MCU
@@ -404,37 +405,19 @@
 
                 $( "#" + streamId ).replaceWith( '<li class="collection-item" id=' + streamId + '><div>' + 'Stream for Id:' + userId + '<a onclick="unsubscribeStream(' + userId + ',' + streamId + ')" class="secondary-content"><i class="material-icons">Unsubscribe</i></a></div></li>');
                 $("#" + streamId + '_audio').remove();
-                $("#" + streamId + '_videoonly').remove();
             }
 
             function unsubscribeStream(userId, streamId) {
                 console.log("unsubscribeStream :", streamId);
-                var mediaType = 'VIDEO';
+                var audioOnly = false;
 
                 webRTCClient.unsubscribe(streamId);
 
                 $( "#" + streamId ).replaceWith( '<li class="collection-item" id=' + streamId + '><div>' + 'Stream for Id:' + userId + '<a onclick="subscribeToUserStream(' + userId + ',' + streamId + ')" class="secondary-content"><i class="material-icons">Subscribe</i></a></div></li>');
 
-                if (userId == apiRTC.session.apiCCId) {
+                audioOnly = true;
 
-                    mediaType = 'AUDIOONLY';
-
-                    $("#localStreamList").append('<li class="collection-item" id=' + streamId + '_audio' + '><div>' + 'Stream for Id:' + userId + '<a onclick="subscribeToUserStream(' + userId + ',' + streamId + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
-
-                    mediaType = 'VIDEOONLY';
-
-                    $("#localStreamList").append('<li class="collection-item" id=' + streamId + '_videoonly' + '><div>' + 'Stream for Id:' + userId + '<a onclick="subscribeToUserStream(' + userId + ',' + streamId + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Video Only</i></a></div></li>');
-
-                } else {
-
-                    mediaType = 'AUDIOONLY';
-
-                    $("#remoteStreamList").append('<li class="collection-item" id=' + streamId + '_audio' + '><div>' + 'Stream for Id:' + userId + '<a onclick="subscribeToUserStream(' + userId + ',' + streamId + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
-
-                    mediaType = 'VIDEOONLY';
-
-                    $("#remoteStreamList").append('<li class="collection-item" id=' + streamId + '_videoonly' + '><div>' + 'Stream for Id:' + userId + '<a onclick="subscribeToUserStream(' + userId + ',' + streamId + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Video Only</i></a></div></li>');
-                }
+                $("#remoteStreamList").append('<li class="collection-item" id=' + streamId + '_audio' + '><div>' + 'Stream for Id:' + userId + '<a onclick="subscribeToUserStream(' + userId + ',' + streamId + ',' + audioOnly + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
             }
 
             function MCUAvailableStreamHandler(e) {
@@ -442,7 +425,7 @@
 
                 var i = 0;
 
-                var mediaType = 'VIDEO';
+                var audioOnly = false;
 
                 if (e.detail.isRemoteStream) {
                     //This a remote stream list, subscribing to remote streams
@@ -450,30 +433,24 @@
 
                     for (i = 0; i < e.detail.streams.length; i += 1) {
 
-                        $("#remoteStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe</i></a></div></li>');
 
-                        mediaType = 'AUDIOONLY';
+                        $("#remoteStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + audioOnly + ')" class="secondary-content"><i class="material-icons">Subscribe</i></a></div></li>');
 
-                        $("#remoteStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '_audio' + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
+                        audioOnly = true;
 
-                        mediaType = 'VIDEOONLY';
-
-                        $("#remoteStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '_videoonly' + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Video Only</i></a></div></li>');
+                        $("#remoteStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '_audio' + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + audioOnly + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
                     }
 
                 } else {
                     //This my own stream, not subscribing to it
                     console.log("my own stream is available on MCU");
 
-                    $("#localStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe</i></a></div></li>');
+                    $("#localStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + audioOnly + ')" class="secondary-content"><i class="material-icons">Subscribe</i></a></div></li>');
 
-                    mediaType = 'AUDIOONLY';
+                    audioOnly = true;
 
-                    $("#localStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '_audio' + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
+                    $("#localStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '_audio' + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + audioOnly + ')" class="secondary-content"><i class="material-icons">Subscribe Audio Only</i></a></div></li>');
 
-                    mediaType = 'VIDEOONLY';
-
-                    $("#localStreamList").append('<li class="collection-item" id=' + e.detail.streams[i].id + '_videoonly' + '><div>' + 'Stream for Id:' + e.detail.streams[i].attributes.callerId + '<a onclick="subscribeToUserStream(' + e.detail.streams[i].attributes.callerId + ',' + e.detail.streams[i].id + ',' + "'" + mediaType + "'" + ')" class="secondary-content"><i class="material-icons">Subscribe Video Only</i></a></div></li>');
                 }
             }
 
@@ -481,6 +458,37 @@
                 console.log("MCURemoveStreamHandler :", e);
 
                 $("#" + e.detail.streamId).remove();
+            }
+
+            function MCURecordedStreamsAvailableHandler(e) {
+                console.log("MCURecordedStreamsAvailableHandler :", e.detail);
+
+                if (e.detail.mediaURL !== undefined) {
+                    $("#recordedStreamList").append('<li class="collection-item" id=' + e.detail.recordedFileName + '><div>' + 'File : ' + e.detail.recordedFileName + '<a href="' + e.detail.mediaURL + '" target="_blank" class="secondary-content">Play File</a></div></li>');
+                } else {
+                    $("#recordedStreamList").append('<li class="collection-item" id=' + e.detail.recordedFileName + '><div>' + 'File : ' + e.detail.recordedFileName + '<a href="https://data2.apizee.com:10000/videoManager?action=play&recordedFileName=' + e.detail.recordedFileName + '" target="_blank" class="secondary-content">Play File</a></div></li>');
+                }
+
+                $("#startRecording").attr("disabled", false);
+                $("#startRecordingAudioOnly").attr("disabled", false);
+                $("#startRecordingVideoOnly").attr("disabled", false);
+
+                $("#stopRecording").attr("disabled", true);
+            }
+
+            function MCURecordingStartedHandler(e) {
+                console.log("MCURecordingStartedHandler :", e.detail);
+                $("#startRecording").attr("disabled", true);
+                $("#startRecordingAudioOnly").attr("disabled", false);
+                $("#startRecordingVideoOnly").attr("disabled", false);
+
+                $("#stopRecording").attr("disabled", false);
+            }
+
+            function errorHandler(e) {
+                console.log("errorHandler :" + e);
+                console.log('e.detail.errorInfo :' + e.detail.errorInfo);
+                console.log('e.detail.errorCode :' + e.detail.errorCode);
             }
 //MCU
 
@@ -501,6 +509,10 @@
                 apiRTC.addEventListener("joinMCUSessionAnswer", joinMCUSessionAnswerHandler);
                 apiRTC.addEventListener("MCUAvailableStream", MCUAvailableStreamHandler);
                 apiRTC.addEventListener("MCURemoveStream", MCURemoveStreamHandler);
+
+                apiRTC.addEventListener("MCURecordingStarted", MCURecordingStartedHandler);
+                apiRTC.addEventListener("MCURecordedStreamsAvailable", MCURecordedStreamsAvailableHandler);
+                apiRTC.addEventListener("error", errorHandler);
 //MCU
 
                 //webRTC Client creation
@@ -512,11 +524,7 @@
             //Bandwitdh limitation
                 webRTCClient.setVideoBandwidth(1500);
 
-            //Adding MCU selection
                 webRTCClient.setMCUConnector('mcu4.apizee.com');
-
-                //webRTCClient.setUserAcceptOnIncomingCall(true);
-                //webRTCClient.setUserAcceptOnIncomingCallBeforeGetUserMedia(true);
 
                 imClient = apiCC.session.createIMClient();
 
@@ -540,6 +548,9 @@
                     $("#streamsList").append('<li class="collection-header" id=localStreamList><h5>Manage my stream :</h5></li>');
 
                     $("#streamsList").append('<li class="collection-header" id=remoteStreamList><h5>List of available streams in room :</h5></li>');
+
+                    $("#streamsList").append('<li class="collection-header" id=recordedStreamList><h5>List of available recorded streams:</h5></li>');
+
                     webRTCClient.joinMCUSession($("#number").val());
                 });
 
@@ -547,6 +558,29 @@
                     console.log("leaveMCUSession");
                     webRTCClient.leaveMCUSession($("#number").val());
                     $("#streamsList").remove();
+                });
+
+                $("#startRecording").click(function () {
+                    console.log("startRecording");
+
+                    var customIdToAddOnFilename = "myCustomIdToAddOnFilename";
+                    webRTCClient.startRecording('AUDIO-VIDEO', customIdToAddOnFilename);
+                });
+                $("#startRecordingAudioOnly").click(function () {
+                    console.log("startRecordingAudioOnly");
+
+                    var customIdToAddOnFilename = "myCustomIdToAddOnFilename";
+                    webRTCClient.startRecording('AUDIO-ONLY', customIdToAddOnFilename);
+                });
+                $("#startRecordingVideoOnly").click(function () {
+                    console.log("startRecordingVideoOnly");
+
+                    var customIdToAddOnFilename = "myCustomIdToAddOnFilename";
+                    webRTCClient.startRecording('VIDEO-ONLY', customIdToAddOnFilename);
+                });
+                $("#stopRecording").click(function () {
+                    console.log("stopRecording");
+                    webRTCClient.stopRecording();
                 });
             }
             $("#addressBook").on('click', function() {

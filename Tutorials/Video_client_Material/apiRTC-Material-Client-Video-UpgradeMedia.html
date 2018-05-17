@@ -8,8 +8,7 @@
         <meta name="author" content="">
         <title>apiRTC Client</title>
 
-        <!-- Compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
         <style>
         body {
@@ -67,84 +66,86 @@
         }
         </style>
 <!--
-        <script src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.debug.js"></script>
+        <script src="https://cloud.apizee.com/apiRTC/apiRTC-latest.min.js"></script>
 -->
-        <script src="https://192.168.1.86:8443/dev/apirtc/bin/apiRTC-3.18.min.debug.js"></script>
-        
+        <script src="https://cloud.apizee.com/apiRTC/v3.18/apiRTC-3.18.min.debug.js"></script>
     </head>
 
     <body>
-        <nav class="light-blue darken-4">
-            <div class="nav-wrapper">
-                <a class="brand-logo" href="../."><img src="../images/apirtc-logo.png" alt="" style="height:50px;margin:8px 40px;"></a>
+        <nav class="grey darken-3" style="height:100px;">
+            <div class="nav-wrapper" >
+                <a class="brand-logo" href="../."><img src="../images/apiRTC_b_Branding_horizontal_ondark.png" alt="" style="height:84px; margin:8px 40px;"></a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
-                    <li><a href="https://github.com/apizee/ApiRTC-examples/tree/master/Tutorials" target="_blank"><i class="fa fa-github" style="vertical-align: middle;"></i> Source code on Github</a></li>
+                    <li><a href="https://github.com/apizee/ApiRTC-examples/tree/master/Tutorials" target="_blank"><i class="fab fa-github" style="vertical-align: middle;"></i> Source code on Github</a></li>
                 </ul>
             </div>
         </nav>
 
         <main class="container grey lighten-5">
             <div class="container master grey lighten-5">
-                <h3><i class="fa fa-dot-circle-o"></i> Tutorial 5: ApiRTC client with screenSharing feature</h3>
+                <h3><i class="far fa-dot-circle"></i> Tutorial 18: ApiRTC client with upgrade media feature - audio to video</h3>
                 <p>
-                <a href="https://github.com/apizee/ApiRTC-examples/blob/master/Tutorials/Video_client_Material/apiRTC-Material-Client-Video-ScreenSharing.html" target="_blank"><i class="fa fa-github" style="vertical-align: middle;"></i> This sample is accessible on Github</a>
+                <a href="https://github.com/apizee/ApiRTC-examples/blob/master/Tutorials/Video_client_Material/apiRTC-Material-Client-Video-upgradeMedia.html" target="_blank"><i class="fab fa-github" style="vertical-align: middle;"></i> This sample is accessible on Github</a>
                 </p>
                 <br>
                 <div class="row">
                     <div class="col s12 m8 l8">
-                        <p>This sample shows an apiRTC client that enable screen sharing.
-                        For security reason, HTTPS is mandatory for this feature. This is only available with Chrome on PC.
+                        <p>This sample shows an apiRTC client that enables to upgrade media to video on an audio call.
                         </p>
-                        <p>ScreenSharing can be simultaneously used with a video call.
-                        </p>
-                        <p>Check the comment "ScreenSharing" in the source code to know what need to be added for the Accept/Refuse feature.
+                        <p>ScreenSharing can be simultaneously used.
                         </p>
                         <p>Used apiRTC functions are :
                             <ul>
-                            <li> - webRTCClient.shareScreen()</li>
-                            <li> - webRTCClient.activateScreenSharing()</li>
+                            <li> - webRTCClient.addVideoMedia()</li>
                             </ul>
                         </p>
                         <p>Used apiRTC events are :
                             <ul>
-                            <li> - desktopCapture</li>
+                            <li> - localStreamRemoved</li>
+                            <li> - remoteStreamRemoved</li>
                             </ul>
                         </p>
                     </div>
                     <div class="col s12 m4 l4 valign-wrapper">
-                        <a href="../Video_client_Material/apiRTC-Material-Client-Video-ScreenSharing.html" target="_blank" class="valign btn btn-large waves-effect waves-light btn-open">Open another client</a>
+                        <a href="../Video_client_Material/apiRTC-Material-Client-Video-upgradeMedia.html" target="_blank" class="valign btn btn-large waves-effect waves-light btn-open">Open another client</a>
                     </div>
                     <div style="clear: both;"></div>
                 </div>
 
                 <div class="row">
-                <div class="col s12 m12 l12">
-                    <div class="col s12 m6 l6">
-                        <div class="input-field">
-                            <button type="button" id="addressBook"  class="btn btn-success">
-                              <i class="fa fa-book"></i>
-                            </button>
-                            <ul id="addressBookDropDown" style="display:none;">
-                                <li><a id="client1" href="#">client1</a></li>
-                                <li><a id="client2" href="#">client2</a></li>
-                            </ul>
-                            <button type="button" id="callVideo" class="btn btn-success">
-                              <i class="fa fa-phone"></i>
-                            </button>
-            <!--ScreenSharing-->
-                            <button type="button" id="shareScreen" class="btn btn-success">
-                              <i class="fa fa-desktop"></i>
-                            </button>
-                            <input id="hangup" class="btn red" type="button" disabled="true" value="Hangup" />
-                            <input type="text" id="number" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                    <div class="col s12 m12 l12">
+                        <div class="col s12 m12 l12">
+                            <div class="input-field">
+                                <button type="button" id="addressBook"  class="btn btn-success">
+                                <i class="fas fa-address-book"></i>
+                                </button>
+                                <ul id="addressBookDropDown" style="display:none;">
+                                    <li><a id="No other connected user" href="#">client1</a></li>
+                                </ul>
+                                <button type="button" id="callAudio" class="btn btn-success">
+                                    <i class="fa fa-microphone"></i>
+                                </button>
+                                <button type="button" id="callVideo" class="btn btn-success">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                                <button type="button" id="shareScreen" class="btn btn-success">   
+                                    <i class="fa fa-desktop"></i>
+                                </button>
+                                <button type="button" id="hangup" class="btn red" disabled="true">
+                                    <i class="fas fa-phone" data-fa-transform="rotate-225"></i>
+                                </button>
+                                <input type="text" id="number" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                            </div>
+                        </div>
+
+                        <div class="col s12 m6 l6">
+                        <div id="hangupButtons"></div>
                         </div>
                     </div>
-
-                    <div class="col s12 m6 l6">
-                       <div id="hangupButtons"></div>
-                    </div>
                 </div>
-            </div>
+                <div class="row">
+                    <input id="addVideoMedia" class="btn green" type="button" value="Add Video Media" disabled="true"/>
+                </div>
 
                 <div class="row">
                     <div class="col s12 m12 l12">
@@ -178,7 +179,7 @@
           </div>
           <div class="footer-copyright grey darken-2">
             <div class="container">
-            &copy; 2014-2015 Apizee
+            &copy; 2018 Apizee
             </div>
           </div>
         </footer>
@@ -199,6 +200,8 @@
 
             //Function to add media stream in Div
             function addStreamInDiv(stream, callType, divId, mediaEltId, style, muted) {
+
+                console.error ("addStreamInDiv mediaEltId :", mediaEltId);
 
                 var mediaElt = null,
                     divElement = null;
@@ -277,25 +280,41 @@
             }
 
             function userMediaErrorHandler(e) {
-                $("#call").attr("disabled", false).val("Call");
                 $("#hangup").attr("disabled", false).val("Hangup");
             }
 
             function hangupHandler(e) {
-                console.log('hangupHandler :' + e.detail.callId);
-
-                if (e.detail.lastEstablishedCall === true) {
-                    $("#call").attr("disabled", false).val("Call");
-                }
-                console.log(e.detail.reason);
+                console.log('hangupHandler :' + e.detail);
 
                 initMediaElementState(e.detail.callId);
                 removeHangupButton(e.detail.callId);
+
+                $("#hangup").attr("disabled", true);
+                $("#callAudio").attr("disabled", false);
+                $("#callVideo").attr("disabled", false);
+                $("#addVideoMedia").attr("disabled", true);
             }
 
             function incomingCallHandler(e) {
+
+                console.log('incomingCallHandler :', e.detail);
+
                 $("#hangup").attr("disabled", false).val("Hangup");
                 addHangupButton(e.detail.callId);
+
+                if (e.detail.callType === "audio") {
+                    $("#addVideoMedia").attr("disabled", false);
+                    $("#addVideoMedia").click(function () {
+                        console.log("addVideoMedia");
+                        webRTCClient.addVideoMedia(e.detail.callId);
+
+                        $("#addVideoMedia").attr("disabled", true);
+                        $("#addVideoMedia").unbind( "click" );
+                    });
+                }
+
+                $("#callAudio").attr("disabled", true);
+                $("#callVideo").attr("disabled", true);
             }
 
             function userMediaSuccessHandler(e) {
@@ -310,14 +329,26 @@
                 addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
                                {width : "160px", height : "120px"}, true);
             */
-                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "mini", 'miniElt-' + e.detail.callId,
-                               {width : "128px", height : "96px"}, true);
+                var streamType = 'video';
+
+                if( e.detail.videoIsAvailable === false) {
+                    //User has no webcam
+                    streamType = 'audio';
+                }
+                webRTCClient.addStreamInDiv(e.detail.stream, streamType, "mini", 'miniElt-' + e.detail.callId,
+                               {width : "256px", height : "128px"}, true);
             }
 
             function remoteStreamAddedHandler(e) {
-                console.log("remoteStreamAddedHandler, e.detail.callId :" + e.detail.callId);
-                console.log("remoteStreamAddedHandler, e.detail.callType :" + e.detail.callType);
-                console.log("userMediaSuccessHandler e.detail.remoteId :" + e.detail.remoteId);
+
+                console.log("remoteStreamAddedHandler, e.detail :" + JSON.stringify(e.detail));
+
+                var streamType = 'video';
+
+                if( e.detail.destCallType === "audioOnly") {
+                    //User has no webcam
+                    streamType = 'audio';
+                }
 
                 //Adding Remote Stream in Div. Video is not muted
 
@@ -326,8 +357,8 @@
                 addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
                                {width : "640px", height : "480px"}, false);
             */
-                webRTCClient.addStreamInDiv(e.detail.stream, e.detail.callType, "remote", 'remoteElt-' + e.detail.callId,
-                               {width : "640px", height : "480px"}, false);
+                webRTCClient.addStreamInDiv(e.detail.stream, streamType, "remote", 'remoteElt-' + e.detail.callId,
+                               {width : "1280px", height : "720px"}, false);
             }
 
             function updateAddressBook() {
@@ -381,25 +412,34 @@
                 }
             }
 
+            function localStreamRemovedHandler(e) {
+                console.log("localStreamRemovedHandler, e.detail :" + e.detail);
+                webRTCClient.removeElementFromDiv('mini', 'miniElt-' + e.detail.callId);
+            }
+
+            function remoteStreamRemovedHandler(e) {
+                console.log("remoteStreamRemovedHandler, e.detail :" + e.detail);
+
+                //streamId modification to remove '/' to avoid issue when using streamId in DOM
+                //var modifiedStreamId = e.detail.stream.id.replace(/\//g, "");
+
+                webRTCClient.removeElementFromDiv('remote', 'remoteElt-' + e.detail.callId);
+            }
+
             //sessionReadyHandler : apiRTC is now connected
             function sessionReadyHandler(e) {
 
                 console.log('sessionReadyHandler :' + apiRTC.session.apiCCId);
-
-                $("#call").attr("disabled", false).val("Call");   //Modification of Call button when phone is registered on Apizee
 
                 apiRTC.addEventListener("userMediaSuccess", userMediaSuccessHandler);
                 apiRTC.addEventListener("incomingCall", incomingCallHandler);
                 apiRTC.addEventListener("userMediaError", userMediaErrorHandler);
                 apiRTC.addEventListener("hangup", hangupHandler);
                 apiRTC.addEventListener("remoteStreamAdded", remoteStreamAddedHandler);
-
-            //screenSharing
+                apiRTC.addEventListener("localStreamRemoved", localStreamRemovedHandler);
+                apiRTC.addEventListener("remoteStreamRemoved", remoteStreamRemovedHandler);
                 apiRTC.addEventListener("desktopCapture", desktopCaptureHandler);
-
-            //connectedUsersList
                 apiRTC.addEventListener("connectedUsersListUpdate", connectedUsersListUpdateHandler);
-            //connectedUsersList
 
                 //webRTC Client creation
                 webRTCClient = apiRTC.session.createWebRTCClient({
@@ -410,20 +450,45 @@
                 webRTCClient.setAllowMultipleCalls(true);
 
             //Bandwitdh limitation
-                webRTCClient.setVideoBandwidth(300);
+                //webRTCClient.setVideoBandwidth(300);
 
             //ScreenSharing Activation
                 webRTCClient.activateScreenSharing();
 
             //Call establishment
+                $("#callAudio").click(function () {
+
+                    var data = {dataCallAudio:"test"};
+                    var callId = webRTCClient.callAudio($("#number").val(), data);
+
+                    if (callId != null) {
+                        addHangupButton(callId);
+                    }
+                    $("#hangup").attr("disabled", false).val("Hangup");
+
+                    $("#callAudio").attr("disabled", true);
+                    $("#callVideo").attr("disabled", true);
+
+                    $("#addVideoMedia").attr("disabled", false);
+                    $("#addVideoMedia").click(function () {
+                        console.log("addVideoMedia");
+                        webRTCClient.addVideoMedia(callId);
+
+                        $("#addVideoMedia").attr("disabled", true);
+                        $("#addVideoMedia").unbind( "click" );
+                    });
+                });
+
                 $("#callVideo").click(function () {
                     $("#hangup").attr("disabled", false).val("Hangup");
                     var callId = webRTCClient.call($("#number").val());
 
-                    console.log("callId on call =" + callId);
                     if (callId != null) {
                         addHangupButton(callId);
                     }
+
+                    $("#callAudio").attr("disabled", true);
+                    $("#callVideo").attr("disabled", true);
                 });
 
             //ScreenSharing establishment
@@ -458,7 +523,6 @@
 
             //Global hangup management : all established client calls will be hangup
                 $("#hangup").click(function () {
-                    $("#call").attr("disabled", false).val("Call");
                     webRTCClient.hangUp();
                 });
             }
